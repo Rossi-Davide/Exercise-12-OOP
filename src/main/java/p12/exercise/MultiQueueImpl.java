@@ -19,6 +19,14 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
         return queues.keySet();
     }
 
+    private Queue<T> getQueue(final Q queue){
+        if(!queues.containsKey(queue)){
+            throw new IllegalArgumentException("Queue is not available");
+        }
+
+        return queues.get(queue);
+    }
+
     @Override
     public Set<Q> availableQueues() {
         return getQueueIds();
@@ -35,21 +43,22 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
     }
 
     @Override
-    public boolean isQueueEmpty(Q queue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isQueueEmpty'");
+    public boolean isQueueEmpty(final Q queue) {
+        return getQueue(queue).isEmpty();
     }
 
     @Override
-    public void enqueue(T elem, Q queue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'enqueue'");
+    public void enqueue(final T elem,final  Q queue) {
+        getQueue(queue).add(elem);
     }
 
     @Override
-    public T dequeue(Q queue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'dequeue'");
+    public T dequeue(final Q queue) {
+        if(isQueueEmpty(queue)){
+            return null;
+        }
+
+        return getQueue(queue).remove();
     }
 
     @Override
