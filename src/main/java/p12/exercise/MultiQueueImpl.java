@@ -1,21 +1,37 @@
 package p12.exercise;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
 
-    @Override
-    public Set<Q> availableQueues() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'availableQueues'");
+    private final Map<Q,Queue<T>> queues;
+
+    public MultiQueueImpl (){
+        this.queues = new HashMap<>();
+    }
+
+    private Set<Q> getQueueIds(){
+        return queues.keySet();
     }
 
     @Override
-    public void openNewQueue(Q queue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'openNewQueue'");
+    public Set<Q> availableQueues() {
+        return getQueueIds();
+    }
+
+    @Override
+    public void openNewQueue(final Q queue) {
+        if(queues.containsKey(queue)){
+            throw new IllegalArgumentException("Queue already open");
+        }
+
+        final Queue<T> elementsQueue = new LinkedList<>();
+        queues.put(queue, elementsQueue);
     }
 
     @Override
