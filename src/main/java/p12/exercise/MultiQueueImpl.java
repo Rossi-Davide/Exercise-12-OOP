@@ -1,6 +1,8 @@
 package p12.exercise;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,10 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
 
     private Set<Q> getQueueIds(){
         return queues.keySet();
+    }
+
+    private Collection<Queue<T>> getQueues(){
+        return queues.values();
     }
 
     private Queue<T> getQueue(final Q queue){
@@ -63,20 +69,35 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
 
     @Override
     public Map<Q, T> dequeueOneFromAllQueues() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'dequeueOneFromAllQueues'");
+        Map<Q, T> dequeuedElements = new HashMap<>();
+
+        for(Q queue : getQueueIds()){
+            dequeuedElements.put(queue,dequeue(queue));
+        }
+
+        return dequeuedElements;
     }
 
     @Override
     public Set<T> allEnqueuedElements() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'allEnqueuedElements'");
+        Set<T> allElements = new HashSet<>();
+
+        for(Q queue : getQueueIds()){
+            allElements.addAll(dequeueAllFromQueue(queue));
+        }
+
+        return allElements;
     }
 
     @Override
-    public List<T> dequeueAllFromQueue(Q queue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'dequeueAllFromQueue'");
+    public List<T> dequeueAllFromQueue(final Q queue) {
+        List<T> elements = new LinkedList<>();
+
+        while (!isQueueEmpty(queue)) {
+            elements.add(dequeue(queue));
+        }
+
+        return elements;
     }
 
     @Override
