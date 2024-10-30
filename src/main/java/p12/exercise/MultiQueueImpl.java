@@ -82,8 +82,8 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
     public Set<T> allEnqueuedElements() {
         Set<T> allElements = new HashSet<>();
 
-        for(Q queue : getQueueIds()){
-            allElements.addAll(dequeueAllFromQueue(queue));
+        for(Queue<T> queue : getQueues()){
+            allElements.addAll(queue);
         }
 
         return allElements;
