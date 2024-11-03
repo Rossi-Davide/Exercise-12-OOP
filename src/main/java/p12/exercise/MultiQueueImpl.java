@@ -1,6 +1,5 @@
 package p12.exercise;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,30 +16,38 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
         this.queues = new HashMap<>();
     }
 
-    private Set<Q> getQueueIds(){
+    private Set<Q> getQueues(){
         return queues.keySet();
     }
 
-    private Collection<Queue<T>> getQueues(){
-        return queues.values();
+    private boolean queueExists(final Q queue){
+        return queues.containsKey(queue);
+    }
+
+    private void checkAvailability(final Q queue){
+        if(!queueExists(queue)){
+            throw new IllegalArgumentException("Queue is not available");
+        }
     }
 
     private Queue<T> getQueue(final Q queue){
-        if(!queues.containsKey(queue)){
-            throw new IllegalArgumentException("Queue is not available");
-        }
-
+        checkAvailability(queue);
         return queues.get(queue);
+    }
+
+    private void closeQueue(Q queue){
+        checkAvailability(queue);
+        queues.remove(queue);
     }
 
     @Override
     public Set<Q> availableQueues() {
-        return getQueueIds();
+        return getQueues();
     }
 
     @Override
     public void openNewQueue(final Q queue) {
-        if(queues.containsKey(queue)){
+        if(queueExists(queue)){
             throw new IllegalArgumentException("Queue already open");
         }
 
@@ -71,7 +78,7 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
     public Map<Q, T> dequeueOneFromAllQueues() {
         Map<Q, T> dequeuedElements = new HashMap<>();
 
-        for(Q queue : getQueueIds()){
+        for(Q queue : getQueues()){
             dequeuedElements.put(queue,dequeue(queue));
         }
 
@@ -82,8 +89,9 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
     public Set<T> allEnqueuedElements() {
         Set<T> allElements = new HashSet<>();
 
-        for(Queue<T> queue : getQueues()){
-            allElements.addAll(queue);
+        for(Q queue : getQueues()){
+
+            allElements.addAll(getQueue(queue));
         }
 
         return allElements;
@@ -102,8 +110,17 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
 
     @Override
     public void closeQueueAndReallocate(Q queue) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'closeQueueAndReallocate'");
+        for(Q destination : getQueues()) {
+            if(!destination.equals(queue)){
+                List<T> elements = dequeueAllFromQueue(queue);
+                getQueue(destination).addAll(elements);
+                closeQueue(queue);
+                return;
+            }
+        }
+
+        throw new IllegalStateException("There's no other queue available to move the elements in");
+
     }
 
 }
