@@ -16,10 +16,6 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
         this.queues = new HashMap<>();
     }
 
-    private Set<Q> getQueues(){
-        return queues.keySet();
-    }
-
     private boolean queueExists(final Q queue){
         return queues.containsKey(queue);
     }
@@ -40,6 +36,10 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
         queues.remove(queue);
     }
 
+    private Set<Q> getQueues(){
+        return queues.keySet();
+    }
+
     @Override
     public Set<Q> availableQueues() {
         return getQueues();
@@ -51,8 +51,7 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
             throw new IllegalArgumentException("Queue already open");
         }
 
-        final Queue<T> elementsQueue = new LinkedList<>();
-        queues.put(queue, elementsQueue);
+        queues.put(queue, new LinkedList<T>());
     }
 
     @Override
@@ -90,7 +89,6 @@ public class MultiQueueImpl<T, Q> implements MultiQueue<T, Q>{
         Set<T> allElements = new HashSet<>();
 
         for(Q queue : getQueues()){
-
             allElements.addAll(getQueue(queue));
         }
 
